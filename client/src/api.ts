@@ -1,4 +1,4 @@
-import type { Feedback, FeedbackCategory, NewFeedback } from './types';
+import type { Feedback, FeedbackCategory, NewFeedback, SiteStats, VisitDevice } from './types';
 
 const jsonHeaders = {
   'Content-Type': 'application/json'
@@ -48,4 +48,31 @@ export const supportFeedback = async (id: number): Promise<Feedback> => {
 
   const body = (await response.json()) as { feedback: Feedback };
   return body.feedback;
+};
+
+export const fetchSiteStats = async (): Promise<SiteStats> => {
+  const response = await fetch(apiPath('/api/admin/stats'));
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+
+  const body = (await response.json()) as { stats: SiteStats };
+  return body.stats;
+};
+
+export const logVisit = async (visit: {
+  path: string;
+  referrer: string | null;
+  device: VisitDevice;
+}): Promise<void> => {
+  const response = await fetch(apiPath('/api/admin/visit'), {
+    method: 'POST',
+    headers: jsonHeaders,
+    body: JSON.stringify(visit)
+  });
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
 };

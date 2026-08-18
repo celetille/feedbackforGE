@@ -31,6 +31,11 @@ button {
   cursor: pointer;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .app-shell {
   width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
@@ -253,7 +258,9 @@ small {
 }
 
 .submit-button:not(:disabled):hover,
-.support-button:hover {
+.support-button:hover,
+.home-link:hover,
+.inline-action:hover {
   transform: translateY(-2px);
 }
 
@@ -346,6 +353,203 @@ small {
   margin: 8px 0 0;
 }
 
+.home-link,
+.inline-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(17, 132, 109, 0.18);
+  border-radius: 999px;
+  background: #f7fffc;
+  color: #075f4e;
+  font-weight: 800;
+  padding: 10px 14px;
+  transition: 160ms ease;
+}
+
+.home-link {
+  align-self: start;
+}
+
+.inline-action {
+  margin-left: auto;
+}
+
+.stats-shell {
+  display: grid;
+  gap: 20px;
+}
+
+.stats-hero {
+  align-items: end;
+}
+
+.stats-intro {
+  margin: 12px 0 0;
+  max-width: 760px;
+  color: #5e7075;
+  line-height: 1.72;
+}
+
+.stats-alert {
+  display: grid;
+  gap: 12px;
+}
+
+.stats-alert .state-message {
+  margin: 0;
+}
+
+.stats-alert .inline-action {
+  justify-self: start;
+}
+.stats-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.stats-panel {
+  grid-column: span 12;
+}
+
+.stats-summary-grid,
+.mini-metrics {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.metric-card {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(23, 50, 59, 0.08);
+  border-radius: 20px;
+  background: rgba(247, 255, 252, 0.84);
+  padding: 18px;
+}
+
+.metric-card span {
+  color: #6a7f86;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.metric-card strong {
+  font-size: clamp(1.55rem, 4vw, 2.2rem);
+  letter-spacing: -0.04em;
+}
+
+.metric-card small {
+  justify-self: start;
+  color: #607178;
+  line-height: 1.4;
+}
+
+.spark-card {
+  display: grid;
+  gap: 14px;
+}
+
+.sparkline {
+  width: 100%;
+  height: auto;
+  min-height: 180px;
+  overflow: visible;
+}
+
+.sparkline path {
+  fill: none;
+  stroke: #22b693;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.spark-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #63757b;
+  font-size: 0.88rem;
+}
+
+.breakdown-list {
+  display: grid;
+  gap: 10px;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid rgba(23, 50, 59, 0.08);
+  border-radius: 18px;
+  background: rgba(247, 255, 252, 0.82);
+  padding: 12px 14px;
+}
+
+.breakdown-row span {
+  color: #31545b;
+  font-weight: 700;
+}
+
+.breakdown-row strong {
+  color: #17323b;
+}
+
+.visit-table {
+  display: grid;
+  gap: 8px;
+}
+
+.visit-table-head,
+.visit-table-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1.1fr 0.7fr 1.4fr;
+  gap: 12px;
+  align-items: center;
+}
+
+.visit-table-head {
+  color: #6a7f86;
+  font-size: 0.84rem;
+  font-weight: 800;
+  padding: 0 14px;
+}
+
+.visit-table-row {
+  border: 1px solid rgba(23, 50, 59, 0.08);
+  border-radius: 18px;
+  background: rgba(247, 255, 252, 0.82);
+  padding: 12px 14px;
+}
+
+.visit-table-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stats-wide {
+  grid-column: span 12;
+}
+
+@media (min-width: 981px) {
+  .stats-summary {
+    grid-column: span 12;
+  }
+
+  .stats-panel:nth-child(2),
+  .stats-panel:nth-child(3),
+  .stats-panel:nth-child(4),
+  .stats-panel:nth-child(5) {
+    grid-column: span 6;
+  }
+}
+
 @media (max-width: 980px) {
   .hero,
   .content-layout {
@@ -397,7 +601,9 @@ small {
     padding: 9px 12px;
   }
 
-  .card-grid {
+  .card-grid,
+  .stats-summary-grid,
+  .mini-metrics {
     grid-template-columns: 1fr;
   }
 
@@ -411,8 +617,19 @@ small {
   }
 
   .submit-button,
-  .support-button {
+  .support-button,
+  .home-link,
+  .inline-action {
     width: 100%;
     align-self: stretch;
+  }
+
+  .visit-table-head,
+  .visit-table-row {
+    grid-template-columns: 1fr;
+  }
+
+  .visit-table-head {
+    display: none;
   }
 }

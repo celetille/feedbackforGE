@@ -1,13 +1,57 @@
-import { useEffect, useState } from 'react';
-import { fetchFeedback, submitFeedback, supportFeedback } from './api';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  fetchFeedback,
+  fetchSiteStats,
+  logVisit,
+  submitFeedback,
+  supportFeedback
+} from './api';
+import AdminStatsPage from './components/AdminStatsPage';
 import FeedbackBoard from './components/FeedbackBoard';
 import FeedbackForm from './components/FeedbackForm';
-import type { Feedback, FeedbackCategory, FeedbackFilter, NewFeedback } from './types';
+import type {
+  Feedback,
+  FeedbackCategory,
+  FeedbackFilter,
+  NewFeedback,
+  SiteStats,
+  VisitDevice
+} from './types';
+
+const loggedVisitPaths = new Set<string>();
 
 const toCategory = (filter: FeedbackFilter): FeedbackCategory | undefined =>
   filter === '全部' ? undefined : filter;
 
-export default function App() {
+const detectDevice = (): VisitDevice => {
+  const width = window.innerWidth;
+  if (width < 768) return 'mobile';
+  if (width < 1024) return 'tablet';
+  return 'desktop';
+};
+
+const usePageVisitTracking = () => {
+  useEffect(() => {
+    const pathname = window.location.pathname || '/';
+    const signature = `${pathname}|${detectDevice()}`;
+
+    if (loggedVisitPaths.has(signature)) {
+      return;
+    }
+
+    loggedVisitPaths.add(signature);
+
+    void logVisit({
+      path: pathname,
+      referrer: document.referrer || null,
+      device: detectDevice()
+    }).catch(() => {
+      loggedVisitPaths.delete(signature);
+    });
+  }, []);
+};
+
+function HomePage() {
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [filter, setFilter] = useState<FeedbackFilter>('全部');
   const [isLoading, setIsLoading] = useState(true);
@@ -66,4 +110,46 @@ export default function App() {
       </div>
     </main>
   );
+}
+
+function StatsRoute() {
+  const [stats, setStats] = useState<SiteStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  const loadStats = async () => {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const result = await fetchSiteStats();
+      setStats(result);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : '统计加载失败');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadStats();
+  }, []);
+
+  const handleRetry = () => {
+    void loadStats();
+  };
+
+  return <AdminStatsPage error={error} isLoading={isLoading} onRetry={handleRetry} stats={stats} />;
+}
+
+export default function App() {
+  usePageVisitTracking();
+
+  const pathname = useMemo(() => window.location.pathname || '/', []);
+
+  if (pathname.startsWith('/admin/stats')) {
+    return <StatsRoute />;
+  }
+
+  return <HomePage />;
 }

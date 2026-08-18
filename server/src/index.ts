@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import feedbackRouter from './routes/feedback.js';
+import adminRouter from './routes/admin.js';
 
 const app = express();
 const port = Number(process.env.PORT ?? 4000);
@@ -21,6 +22,7 @@ app.get('/api/health', (_request, response) => {
 });
 
 app.use('/api/feedback', feedbackRouter);
+app.use('/api/admin', adminRouter);
 
 if (hasPublicAssets) {
   app.use(express.static(publicDir));

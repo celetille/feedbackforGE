@@ -22,3 +22,44 @@ export type NewFeedback = {
   title: string;
   content: string;
 };
+
+export type VisitDevice = 'mobile' | 'tablet' | 'desktop';
+
+export type PageVisit = {
+  id: number;
+  path: string;
+  referrer: string | null;
+  device: VisitDevice;
+  createdAt: string;
+};
+
+export type CountBucket = {
+  label: string;
+  count: number;
+};
+
+export type DailyTrafficPoint = {
+  date: string;
+  count: number;
+};
+
+export type SiteStats = {
+  summary: {
+    totalVisits: number;
+    todayVisits: number;
+    weekVisits: number;
+    uniquePages: number;
+    totalFeedback: number;
+    todayFeedback: number;
+    totalSupports: number;
+    mobileVisits: number;
+    tabletVisits: number;
+    desktopVisits: number;
+  };
+  pageBreakdown: CountBucket[];
+  categoryBreakdown: Array<{ category: FeedbackCategory; count: number }>;
+  deviceBreakdown: Array<{ device: VisitDevice; count: number }>;
+  dailyTraffic: DailyTrafficPoint[];
+  recentVisits: PageVisit[];
+  topReferrers: CountBucket[];
+};

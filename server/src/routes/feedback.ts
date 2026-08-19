@@ -10,7 +10,7 @@ const categorySchema = z.enum(feedbackCategories);
 const createFeedbackSchema = z.object({
   category: categorySchema,
   title: z.string().trim().min(2, '标题至少需要 2 个字').max(60, '标题不能超过 60 个字'),
-  content: z.string().trim().min(5, '内容至少需要 5 个字').max(600, '内容不能超过 600 个字')
+  content: z.string().trim().max(600, '内容不能超过 600 个字').optional().default('')
 });
 
 router.get('/', (request, response) => {

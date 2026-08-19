@@ -18,7 +18,6 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
   const validationMessage = useMemo(() => {
     if (!category) return '请选择一个反馈分类';
     if (title.trim().length < 2) return '标题至少需要 2 个字';
-    if (content.trim().length < 5) return '内容至少需要 5 个字';
     if (title.length > TITLE_LIMIT) return '标题字数超出限制';
     if (content.length > CONTENT_LIMIT) return '内容字数超出限制';
     return '';
@@ -57,7 +56,7 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
       <div className="section-heading">
         <p className="eyebrow">匿名入口</p>
         <h2 id="feedback-form-title">提交你的校园反馈</h2>
-        <p>无需登录，不填写姓名、学号或联系方式，只记录反馈内容本身。</p>
+        <p>无需登录，不填写姓名、学号或联系方式；只填标题也可以发布。</p>
       </div>
 
       <form className="feedback-form" onSubmit={handleSubmit}>
@@ -91,11 +90,11 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
           </label>
 
           <label className="field-block">
-            <span>反馈内容</span>
+            <span>反馈内容（选填）</span>
             <textarea
               maxLength={CONTENT_LIMIT + 40}
               onChange={(event) => setContent(event.target.value)}
-              placeholder="请尽量描述具体场景、影响和你期待的改进方向。"
+              placeholder="可以补充具体场景、影响和你期待的改进方向。"
               rows={8}
               value={content}
             />

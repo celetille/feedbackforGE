@@ -4,11 +4,12 @@ const filters: FeedbackFilter[] = ['全部', ...feedbackCategories];
 
 const formatTime = (value: string) =>
   new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(new Date(value.replace(' ', 'T')));
+  }).format(new Date(value.replace(' ', 'T') + 'Z'));
 
 type FeedbackBoardProps = {
   feedback: Feedback[];
@@ -33,7 +34,7 @@ export default function FeedbackBoard({
         <div>
           <p className="eyebrow">公开看板</p>
           <h2 id="feedback-board-title">大家正在关心什么</h2>
-          <p>默认按最新提交排序，支持按分类快速筛选。</p>
+          <p>默认按支持量从多到少排序，支持按分类快速筛选。</p>
         </div>
         <span className="feedback-count">{feedback.length} 条</span>
       </div>
@@ -69,7 +70,7 @@ export default function FeedbackBoard({
               <time dateTime={item.createdAt}>{formatTime(item.createdAt)}</time>
             </div>
             <h3>{item.title}</h3>
-            <p>{item.content}</p>
+            {item.content ? <p>{item.content}</p> : null}
             <button className="support-button" onClick={() => onSupport(item.id)} type="button">
               支持 {item.supportCount}
             </button>

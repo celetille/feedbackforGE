@@ -9,14 +9,17 @@ type AdminStatsPageProps = {
 
 const formatDateTime = (value: string) =>
   new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit'
-  }).format(new Date(value.replace(' ', 'T')));
+  }).format(new Date(value.replace(' ', 'T') + 'Z'));
 
 const formatDayLabel = (value: string) =>
-  new Intl.DateTimeFormat('zh-CN', { weekday: 'short' }).format(new Date(value));
+  new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', weekday: 'short' }).format(
+    new Date(value + 'T00:00:00+08:00')
+  );
 
 const formatDevice = (device: PageVisit['device']) => {
   if (device === 'mobile') return '手机';

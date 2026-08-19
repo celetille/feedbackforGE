@@ -51,6 +51,15 @@ const usePageVisitTracking = () => {
   }, []);
 };
 
+const sortFeedback = (items: Feedback[]) =>
+  [...items].sort((left, right) => {
+    if (right.supportCount !== left.supportCount) {
+      return right.supportCount - left.supportCount;
+    }
+
+    return new Date(right.createdAt.replace(' ', 'T')).getTime() - new Date(left.createdAt.replace(' ', 'T')).getTime();
+  });
+
 function HomePage() {
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [filter, setFilter] = useState<FeedbackFilter>('全部');
@@ -63,7 +72,7 @@ function HomePage() {
 
     try {
       const items = await fetchFeedback(toCategory(activeFilter));
-      setFeedback(items);
+      setFeedback(sortFeedback(items));
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : '看板加载失败');
     } finally {
@@ -79,13 +88,13 @@ function HomePage() {
     const created = await submitFeedback(newFeedback);
 
     if (filter === '全部' || filter === created.category) {
-      setFeedback((items) => [created, ...items]);
+      setFeedback((items) => sortFeedback([created, ...items]));
     }
   };
 
   const handleSupport = async (id: number) => {
     const updated = await supportFeedback(id);
-    setFeedback((items) => items.map((item) => (item.id === id ? updated : item)));
+    setFeedback((items) => sortFeedback(items.map((item) => (item.id === id ? updated : item))));
   };
 
   return (

@@ -108,14 +108,14 @@ export const listFeedback = (category?: FeedbackCategory): Feedback[] => {
           `SELECT id, category, title, content, support_count, created_at
            FROM feedback
            WHERE category = ?
-           ORDER BY datetime(created_at) DESC, id DESC`
+           ORDER BY support_count DESC, datetime(created_at) DESC, id DESC`
         )
         .all(category)
     : db
         .prepare(
           `SELECT id, category, title, content, support_count, created_at
            FROM feedback
-           ORDER BY datetime(created_at) DESC, id DESC`
+           ORDER BY support_count DESC, datetime(created_at) DESC, id DESC`
         )
         .all();
 

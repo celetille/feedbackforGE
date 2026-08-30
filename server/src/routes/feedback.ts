@@ -21,7 +21,18 @@ router.get('/', (request, response) => {
     return;
   }
 
-  response.json({ feedback: listFeedback(parsedCategory.data) });
+  response.json({ feedback: listFeedback(parsedCategory.data, false) });
+});
+
+router.get('/private', (request, response) => {
+  const parsedCategory = categorySchema.optional().safeParse(request.query.category);
+
+  if (!parsedCategory.success) {
+    response.status(400).json({ message: '反馈分类不存在' });
+    return;
+  }
+
+  response.json({ feedback: listFeedback(parsedCategory.data, true) });
 });
 
 router.post('/', (request, response) => {
@@ -36,6 +47,18 @@ router.post('/', (request, response) => {
   response.status(201).json({ feedback });
 });
 
+router.post('/private', (request, response) => {
+  const parsedBody = createFeedbackSchema.safeParse(request.body);
+
+  if (!parsedBody.success) {
+    response.status(400).json({ message: parsedBody.error.issues[0]?.message ?? '私密留言不符合要求' });
+    return;
+  }
+
+  const feedback = createFeedback({ ...parsedBody.data, isPrivate: true });
+  response.status(201).json({ feedback });
+});
+
 router.post('/:id/support', (request, response) => {
   const id = Number(request.params.id);
 
@@ -44,7 +67,7 @@ router.post('/:id/support', (request, response) => {
     return;
   }
 
-  const feedback = supportFeedback(id);
+  const feedback = supportFeedback(id, false);
 
   if (!feedback) {
     response.status(404).json({ message: '反馈不存在' });

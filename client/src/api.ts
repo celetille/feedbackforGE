@@ -24,6 +24,32 @@ export const fetchFeedback = async (category?: FeedbackCategory): Promise<Feedba
   return body.feedback;
 };
 
+export const fetchPrivateFeedback = async (): Promise<Feedback[]> => {
+  const response = await fetch(apiPath('/api/feedback/private'));
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+
+  const body = (await response.json()) as { feedback: Feedback[] };
+  return body.feedback;
+};
+
+export const submitPrivateFeedback = async (feedback: NewFeedback): Promise<Feedback> => {
+  const response = await fetch(apiPath('/api/feedback/private'), {
+    method: 'POST',
+    headers: jsonHeaders,
+    body: JSON.stringify(feedback)
+  });
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+
+  const body = (await response.json()) as { feedback: Feedback };
+  return body.feedback;
+};
+
 export const submitFeedback = async (feedback: NewFeedback): Promise<Feedback> => {
   const response = await fetch(apiPath('/api/feedback'), {
     method: 'POST',

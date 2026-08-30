@@ -34,6 +34,7 @@ db.exec(`
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     support_count INTEGER NOT NULL DEFAULT 0,
+    is_private INTEGER NOT NULL DEFAULT 0,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -51,12 +52,18 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_page_visits_path ON page_visits(path);
 `);
 
+const feedbackColumns = db.prepare('PRAGMA table_info(feedback)').all() as Array<{ name: string }>;
+if (!feedbackColumns.some((column) => column.name === 'is_private')) {
+  db.exec('ALTER TABLE feedback ADD COLUMN is_private INTEGER NOT NULL DEFAULT 0');
+}
+
 type FeedbackRow = {
   id: number;
   category: FeedbackCategory;
   title: string;
   content: string;
   support_count: number;
+  is_private: number;
   created_at: string;
 };
 
@@ -74,7 +81,8 @@ const mapFeedback = (row: FeedbackRow): Feedback => ({
   title: row.title,
   content: row.content,
   supportCount: row.support_count,
-  createdAt: row.created_at
+  createdAt: row.created_at,
+  isPrivate: row.is_private === 1
 });
 
 const mapVisit = (row: VisitRow): PageVisit => ({
@@ -101,20 +109,25 @@ const getBuckets = <T extends CountBucket>(sql: string, rowsKey: string): T[] =>
   })) as T[];
 };
 
-export const listFeedback = (category?: FeedbackCategory): Feedback[] => {
+export const listFeedback = (
+  category?: FeedbackCategory,
+  isPrivate = false
+): Feedback[] => {
+  const visibilityClause = isPrivate ? 'is_private = 1' : 'is_private = 0';
   const rows = category
     ? db
         .prepare(
-          `SELECT id, category, title, content, support_count, created_at
+          `SELECT id, category, title, content, support_count, is_private, created_at
            FROM feedback
-           WHERE category = ?
+           WHERE category = ? AND ${visibilityClause}
            ORDER BY support_count DESC, datetime(created_at) DESC, id DESC`
         )
         .all(category)
     : db
         .prepare(
-          `SELECT id, category, title, content, support_count, created_at
+          `SELECT id, category, title, content, support_count, is_private, created_at
            FROM feedback
+           WHERE ${visibilityClause}
            ORDER BY support_count DESC, datetime(created_at) DESC, id DESC`
         )
         .all();
@@ -124,12 +137,12 @@ export const listFeedback = (category?: FeedbackCategory): Feedback[] => {
 
 export const createFeedback = (feedback: NewFeedback): Feedback => {
   const result = db
-    .prepare('INSERT INTO feedback (category, title, content) VALUES (?, ?, ?)')
-    .run(feedback.category, feedback.title, feedback.content);
+    .prepare('INSERT INTO feedback (category, title, content, is_private) VALUES (?, ?, ?, ?)')
+    .run(feedback.category, feedback.title, feedback.content, feedback.isPrivate ? 1 : 0);
 
   const row = db
     .prepare(
-      `SELECT id, category, title, content, support_count, created_at
+      `SELECT id, category, title, content, support_count, is_private, created_at
        FROM feedback
        WHERE id = ?`
     )
@@ -138,9 +151,10 @@ export const createFeedback = (feedback: NewFeedback): Feedback => {
   return mapFeedback(row as FeedbackRow);
 };
 
-export const supportFeedback = (id: number): Feedback | null => {
+export const supportFeedback = (id: number, isPrivate = false): Feedback | null => {
+  const visibilityClause = isPrivate ? 'is_private = 1' : 'is_private = 0';
   const result = db
-    .prepare('UPDATE feedback SET support_count = support_count + 1 WHERE id = ?')
+    .prepare(`UPDATE feedback SET support_count = support_count + 1 WHERE id = ? AND ${visibilityClause}`)
     .run(id);
 
   if (result.changes === 0) {
@@ -149,9 +163,9 @@ export const supportFeedback = (id: number): Feedback | null => {
 
   const row = db
     .prepare(
-      `SELECT id, category, title, content, support_count, created_at
+      `SELECT id, category, title, content, support_count, is_private, created_at
        FROM feedback
-       WHERE id = ?`
+       WHERE id = ? AND ${visibilityClause}`
     )
     .get(id);
 

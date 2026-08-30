@@ -9,6 +9,7 @@ import {
 import AdminStatsPage from './components/AdminStatsPage';
 import FeedbackBoard from './components/FeedbackBoard';
 import FeedbackForm from './components/FeedbackForm';
+import PrivateFeedbackPage from './components/PrivateFeedbackPage';
 import type {
   Feedback,
   FeedbackCategory,
@@ -117,6 +118,10 @@ function HomePage() {
           onSupport={handleSupport}
         />
       </div>
+
+      <a className="private-link" href="/private">
+        进入私密留言区
+      </a>
     </main>
   );
 }
@@ -155,6 +160,10 @@ export default function App() {
   usePageVisitTracking();
 
   const pathname = useMemo(() => window.location.pathname || '/', []);
+
+  if (pathname.startsWith('/private')) {
+    return <PrivateFeedbackPage />;
+  }
 
   if (pathname.startsWith('/admin/stats')) {
     return <StatsRoute />;

@@ -15,12 +15,14 @@ export type Feedback = {
   content: string;
   supportCount: number;
   createdAt: string;
+  isPrivate: boolean;
 };
 
 export type NewFeedback = {
   category: FeedbackCategory;
   title: string;
   content: string;
+  isPrivate?: boolean;
 };
 
 export type VisitDevice = 'mobile' | 'tablet' | 'desktop';

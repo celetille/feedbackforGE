@@ -64,6 +64,7 @@ const sortFeedback = (items: Feedback[]) =>
 function HomePage() {
   const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [filter, setFilter] = useState<FeedbackFilter>('全部');
+  const [isPrivateMode, setIsPrivateMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -88,7 +89,7 @@ function HomePage() {
   const handleSubmit = async (newFeedback: NewFeedback) => {
     const created = await submitFeedback(newFeedback);
 
-    if (filter === '全部' || filter === created.category) {
+    if (!created.isPrivate && (filter === '全部' || filter === created.category)) {
       setFeedback((items) => sortFeedback([created, ...items]));
     }
   };
@@ -99,7 +100,7 @@ function HomePage() {
   };
 
   return (
-    <main className="app-shell">
+    <main className={`app-shell ${isPrivateMode ? 'private-mode' : ''}`}>
       <header className="hero">
         <div>
           <p className="eyebrow">Campus Voice</p>
@@ -108,20 +109,23 @@ function HomePage() {
       </header>
 
       <div className="content-layout">
-        <FeedbackForm onSubmit={handleSubmit} />
-        <FeedbackBoard
-          error={error}
-          feedback={feedback}
-          filter={filter}
-          isLoading={isLoading}
-          onFilterChange={setFilter}
-          onSupport={handleSupport}
+        <FeedbackForm
+          isPrivate={isPrivateMode}
+          onPrivacyChange={setIsPrivateMode}
+          onSubmit={handleSubmit}
         />
+        {!isPrivateMode ? (
+          <FeedbackBoard
+            error={error}
+            feedback={feedback}
+            filter={filter}
+            isLoading={isLoading}
+            onFilterChange={setFilter}
+            onSupport={handleSupport}
+          />
+        ) : null}
       </div>
 
-      <a className="private-link" href="/private">
-        进入私密留言区
-      </a>
     </main>
   );
 }

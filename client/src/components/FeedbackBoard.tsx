@@ -34,7 +34,6 @@ export default function FeedbackBoard({
         <div>
           <p className="eyebrow">公开看板</p>
           <h2 id="feedback-board-title">大家正在关心什么</h2>
-          <p>默认按支持量从多到少排序，支持按分类快速筛选。</p>
         </div>
         <span className="feedback-count">{feedback.length} 条</span>
       </div>

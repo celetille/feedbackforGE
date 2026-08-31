@@ -51,7 +51,8 @@ export const submitPrivateFeedback = async (feedback: NewFeedback): Promise<Feed
 };
 
 export const submitFeedback = async (feedback: NewFeedback): Promise<Feedback> => {
-  const response = await fetch(apiPath('/api/feedback'), {
+  const endpoint = feedback.isPrivate ? '/api/feedback/private' : '/api/feedback';
+  const response = await fetch(apiPath(endpoint), {
     method: 'POST',
     headers: jsonHeaders,
     body: JSON.stringify(feedback)

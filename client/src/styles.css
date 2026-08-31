@@ -124,13 +124,123 @@ a {
   white-space: nowrap;
 }
 
+.privacy-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 56px;
+  border: 1px solid rgba(23, 50, 59, 0.12);
+  border-radius: 18px;
+  background: rgba(247, 255, 252, 0.75);
+  padding: 13px 15px;
+}
+
+.privacy-toggle-copy {
+  display: grid;
+  gap: 0;
+  line-height: 28px;
+}
+
+.privacy-toggle-copy small {
+  justify-self: start;
+}
+
+.privacy-toggle > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.privacy-toggle-track {
+  position: relative;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 28px;
+  border-radius: 999px;
+  background: #c6d5d8;
+  transition: 160ms ease;
+}
+
+.privacy-toggle-track::after {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 6px rgba(23, 50, 59, 0.18);
+  content: '';
+  transition: 160ms ease;
+}
+
+.privacy-toggle > input:checked + .privacy-toggle-track {
+  background: #6f7b80;
+}
+
+.privacy-toggle > input:checked + .privacy-toggle-track::after {
+  transform: translateX(20px);
+}
+
+.privacy-toggle > input:focus-visible + .privacy-toggle-track {
+  outline: 3px solid rgba(111, 123, 128, 0.28);
+  outline-offset: 3px;
+}
+
+body:has(.private-mode) {
+  background:
+    radial-gradient(circle at top left, rgba(174, 184, 188, 0.28), transparent 34rem),
+    linear-gradient(135deg, #f5f6f6 0%, #e9edef 48%, #f1f1f2 100%);
+}
+
+.private-mode .eyebrow,
+.private-mode .card-meta span {
+  color: #68757a;
+}
+
+.private-mode .feedback-count,
+.private-mode .privacy-toggle,
+.private-mode .chip,
+.private-mode .filter-chip,
+.private-mode .home-link,
+.private-mode .feedback-fields-card,
+.private-mode .feedback-fields-card input,
+.private-mode .feedback-fields-card textarea,
+.private-mode .empty-state {
+  border-color: rgba(76, 89, 94, 0.2);
+  background: #f2f4f4;
+  color: #4d5a5f;
+}
+
+.private-mode .chip:hover,
+.private-mode .filter-chip:hover,
+.private-mode .chip.active,
+.private-mode .filter-chip.active {
+  border-color: #7d898e;
+  background: #dfe4e5;
+  color: #354247;
+}
+
+.private-mode .submit-button {
+  background: linear-gradient(135deg, #647176, #9ba5a8);
+  box-shadow: 0 18px 34px rgba(76, 89, 94, 0.2);
+}
+
+.private-mode .form-message,
+.private-mode .state-message {
+  background: #e8ebec;
+  color: #4d5a5f;
+}
+
 .feedback-form {
   display: grid;
   gap: 18px;
 }
 
 fieldset,
-label {
+label:not(.privacy-toggle) {
   display: grid;
   gap: 10px;
   margin: 0;
@@ -354,7 +464,6 @@ small {
 }
 
 .home-link,
-.private-link,
 .inline-action {
   display: inline-flex;
   align-items: center;
@@ -371,11 +480,6 @@ small {
 
 .home-link {
   align-self: start;
-}
-
-.private-link {
-  justify-self: start;
-  margin-top: 20px;
 }
 
 .private-shell {
@@ -397,8 +501,9 @@ small {
   align-items: start;
 }
 
-.private-board {
-  min-width: 0;
+.private-placeholder {
+  min-height: 320px;
+  background: rgba(255, 255, 255, 0.42);
 }
 
 .private-list {
@@ -674,7 +779,6 @@ small {
   .submit-button,
   .support-button,
   .home-link,
-  .private-link,
   .inline-action {
     width: 100%;
     align-self: stretch;
@@ -688,4 +792,43 @@ small {
   .visit-table-head {
     display: none;
   }
+}
+
+/* Keep pill controls visually consistent across public and private modes. */
+.feedback-count,
+.privacy-toggle,
+.chip,
+.filter-chip {
+  border-color: #c7d0d3;
+  background: #eef1f2;
+  color: #4d5a5f;
+}
+
+.chip:hover,
+.filter-chip:hover,
+.chip.active,
+.filter-chip.active {
+  border-color: #8b989d;
+  background: #dfe4e6;
+  color: #354247;
+}
+
+.privacy-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+  padding: 13px 15px;
+}
+
+.privacy-toggle-copy {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  line-height: 28px;
+}
+
+.privacy-toggle-track {
+  flex: 0 0 48px;
 }

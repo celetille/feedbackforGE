@@ -5,10 +5,18 @@ const TITLE_LIMIT = 60;
 const CONTENT_LIMIT = 600;
 
 type FeedbackFormProps = {
+  isPrivate?: boolean;
+  onPrivacyChange?: (isPrivate: boolean) => void;
   onSubmit: (feedback: NewFeedback) => Promise<void>;
+  showPrivacyToggle?: boolean;
 };
 
-export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
+export default function FeedbackForm({
+  isPrivate = false,
+  onPrivacyChange,
+  onSubmit,
+  showPrivacyToggle = true
+}: FeedbackFormProps) {
   const [category, setCategory] = useState<FeedbackCategory | ''>('');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -38,7 +46,8 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
       await onSubmit({
         category,
         title: title.trim(),
-        content: content.trim()
+        content: content.trim(),
+        isPrivate
       });
       setCategory('');
       setTitle('');
@@ -55,9 +64,27 @@ export default function FeedbackForm({ onSubmit }: FeedbackFormProps) {
     <section className="panel feedback-form-panel" aria-labelledby="feedback-form-title">
       <div className="section-heading">
         <p className="eyebrow">匿名入口</p>
-        <h2 id="feedback-form-title">提交你的校园反馈</h2>
-        <p>无需登录，不填写姓名、学号或联系方式；只填标题也可以发布。</p>
+        <h2 id="feedback-form-title">提交你的{isPrivate ? '私密' : '校园'}反馈</h2>
+        <p>
+          {isPrivate
+            ? '这条留言不会出现在公开面板上，只会让导员查看。'
+            : '无需登录，不填写姓名、学号或联系方式。'}
+        </p>
       </div>
+
+      {showPrivacyToggle ? (
+        <label className="privacy-toggle">
+          <span className="privacy-toggle-copy">
+            <strong>私密留言</strong>
+          </span>
+          <input
+            checked={isPrivate}
+            onChange={(event) => onPrivacyChange?.(event.target.checked)}
+            type="checkbox"
+          />
+          <span className="privacy-toggle-track" aria-hidden="true" />
+        </label>
+      ) : null}
 
       <form className="feedback-form" onSubmit={handleSubmit}>
         <fieldset>

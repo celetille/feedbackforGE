@@ -1,20 +1,11 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { createFeedback, hasPrivateAccount, listFeedback, supportFeedback, verifyPrivateAccount, createPrivateAccount } from '../db.js';
+import { createFeedback, listFeedback, supportFeedback } from '../db.js';
 import { feedbackCategories } from '../types.js';
 
 const router = Router();
 
 const categorySchema = z.enum(feedbackCategories);
-const accountNameSchema = z.string().trim().min(2, '账户名至少需要 2 个字').max(32, '账户名不能超过 32 个字');
-
-const readPrivateAccountName = (value: string | string[] | undefined): string => {
-  if (Array.isArray(value)) {
-    return value[0]?.trim() ?? '';
-  }
-
-  return value?.trim() ?? '';
-};
 
 const createFeedbackSchema = z.object({
   category: categorySchema,
@@ -33,69 +24,11 @@ router.get('/', (request, response) => {
   response.json({ feedback: listFeedback(parsedCategory.data, false) });
 });
 
-router.get('/private/status', (_request, response) => {
-  response.json({ hasAccount: hasPrivateAccount() });
-});
-
-router.post('/private/setup', (request, response) => {
-  const parsedAccountName = accountNameSchema.safeParse(request.body?.accountName);
-
-  if (!parsedAccountName.success) {
-    response.status(400).json({ message: parsedAccountName.error.issues[0]?.message ?? '账户名不符合要求' });
-    return;
-  }
-
-  if (hasPrivateAccount()) {
-    response.status(409).json({ message: '账户已经创建过，不能重复创建' });
-    return;
-  }
-
-  if (!createPrivateAccount(parsedAccountName.data)) {
-    response.status(500).json({ message: '账户创建失败' });
-    return;
-  }
-
-  response.status(201).json({ accountName: parsedAccountName.data });
-});
-
-router.post('/private/login', (request, response) => {
-  const parsedAccountName = accountNameSchema.safeParse(request.body?.accountName);
-
-  if (!parsedAccountName.success) {
-    response.status(400).json({ message: parsedAccountName.error.issues[0]?.message ?? '账户名不符合要求' });
-    return;
-  }
-
-  if (!hasPrivateAccount()) {
-    response.status(503).json({ message: '账户尚未创建' });
-    return;
-  }
-
-  if (!verifyPrivateAccount(parsedAccountName.data)) {
-    response.status(401).json({ message: '账户名不正确' });
-    return;
-  }
-
-  response.json({ accountName: parsedAccountName.data });
-});
-
 router.get('/private', (request, response) => {
   const parsedCategory = categorySchema.optional().safeParse(request.query.category);
 
   if (!parsedCategory.success) {
     response.status(400).json({ message: '反馈分类不存在' });
-    return;
-  }
-
-  const accountName = readPrivateAccountName(request.header('x-private-account-name'));
-
-  if (!hasPrivateAccount()) {
-    response.status(503).json({ message: '账户尚未创建' });
-    return;
-  }
-
-  if (!verifyPrivateAccount(accountName)) {
-    response.status(401).json({ message: '账户名不正确' });
     return;
   }
 

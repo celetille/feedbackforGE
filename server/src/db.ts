@@ -46,12 +46,6 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
-  CREATE TABLE IF NOT EXISTS accounts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT NOT NULL UNIQUE,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  );
-
   CREATE INDEX IF NOT EXISTS idx_feedback_created_at ON feedback(created_at DESC);
   CREATE INDEX IF NOT EXISTS idx_feedback_category ON feedback(category);
   CREATE INDEX IF NOT EXISTS idx_page_visits_created_at ON page_visits(created_at DESC);
@@ -114,30 +108,6 @@ const getBuckets = <T extends CountBucket>(sql: string, rowsKey: string): T[] =>
     count: Number(row.count ?? 0)
   })) as T[];
 };
-
-export const hasPrivateAccount = (): boolean => getCount('SELECT COUNT(*) AS count FROM accounts') > 0;
-
-export const createPrivateAccount = (username: string): boolean => {
-  const result = db.prepare('INSERT INTO accounts (username) VALUES (?)').run(username);
-  return result.changes === 1;
-};
-
-export const verifyPrivateAccount = (username: string): boolean => {
-  const row = db.prepare('SELECT username FROM accounts WHERE username = ?').get(username) as
-    | { username: string }
-    | undefined;
-  return row?.username === username;
-};
-
-export const accountExists = hasPrivateAccount;
-
-export const createAccount = (username: string): string => {
-  createPrivateAccount(username);
-  return username;
-};
-
-export const findAccount = (username: string): string | null =>
-  verifyPrivateAccount(username) ? username : null;
 
 export const listFeedback = (
   category?: FeedbackCategory,

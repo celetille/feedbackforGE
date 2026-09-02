@@ -129,13 +129,6 @@ export const verifyPrivateAccount = (username: string): boolean => {
   return row?.username === username;
 };
 
-export const getPrivateAccountUsername = (): string | null => {
-  const row = db.prepare('SELECT username FROM accounts ORDER BY id ASC LIMIT 1').get() as
-    | { username: string }
-    | undefined;
-  return row?.username ?? null;
-};
-
 export const accountExists = hasPrivateAccount;
 
 export const createAccount = (username: string): string => {

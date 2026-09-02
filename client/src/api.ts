@@ -7,6 +7,8 @@ const jsonHeaders = {
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? '';
 const apiPath = (path: string) => `${apiBaseUrl}${path}`;
 
+const privateFeedbackPasswordHeader = 'x-private-feedback-password';
+
 const readError = async (response: Response) => {
   const body = (await response.json().catch(() => null)) as { message?: string } | null;
   return body?.message ?? '请求失败，请稍后再试';
@@ -24,8 +26,35 @@ export const fetchFeedback = async (category?: FeedbackCategory): Promise<Feedba
   return body.feedback;
 };
 
-export const fetchPrivateFeedback = async (): Promise<Feedback[]> => {
-  const response = await fetch(apiPath('/api/feedback/private'));
+export const fetchPrivateAccessStatus = async (): Promise<boolean> => {
+  const response = await fetch(apiPath('/api/feedback/private/status'));
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+
+  const body = (await response.json()) as { isPasswordConfigured: boolean };
+  return body.isPasswordConfigured;
+};
+
+export const setupPrivatePassword = async (password: string): Promise<void> => {
+  const response = await fetch(apiPath('/api/feedback/private/setup'), {
+    method: 'POST',
+    headers: jsonHeaders,
+    body: JSON.stringify({ password })
+  });
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+};
+
+export const fetchPrivateFeedback = async (password: string): Promise<Feedback[]> => {
+  const response = await fetch(apiPath('/api/feedback/private'), {
+    headers: {
+      [privateFeedbackPasswordHeader]: password
+    }
+  });
 
   if (!response.ok) {
     throw new Error(await readError(response));

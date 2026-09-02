@@ -4,6 +4,8 @@ const jsonHeaders = {
   'Content-Type': 'application/json'
 };
 
+const privateAccountNameHeader = 'x-private-account-name';
+
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '') ?? '';
 const apiPath = (path: string) => `${apiBaseUrl}${path}`;
 
@@ -24,8 +26,47 @@ export const fetchFeedback = async (category?: FeedbackCategory): Promise<Feedba
   return body.feedback;
 };
 
-export const fetchPrivateFeedback = async (): Promise<Feedback[]> => {
-  const response = await fetch(apiPath('/api/feedback/private'));
+export const fetchPrivateAccountStatus = async (): Promise<boolean> => {
+  const response = await fetch(apiPath('/api/feedback/private/status'));
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+
+  const body = (await response.json()) as { hasAccount: boolean };
+  return body.hasAccount;
+};
+
+export const setupPrivateAccount = async (accountName: string): Promise<void> => {
+  const response = await fetch(apiPath('/api/feedback/private/setup'), {
+    method: 'POST',
+    headers: jsonHeaders,
+    body: JSON.stringify({ accountName })
+  });
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+};
+
+export const loginPrivateAccount = async (accountName: string): Promise<void> => {
+  const response = await fetch(apiPath('/api/feedback/private/login'), {
+    method: 'POST',
+    headers: jsonHeaders,
+    body: JSON.stringify({ accountName })
+  });
+
+  if (!response.ok) {
+    throw new Error(await readError(response));
+  }
+};
+
+export const fetchPrivateFeedback = async (accountName: string): Promise<Feedback[]> => {
+  const response = await fetch(apiPath('/api/feedback/private'), {
+    headers: {
+      [privateAccountNameHeader]: accountName
+    }
+  });
 
   if (!response.ok) {
     throw new Error(await readError(response));

@@ -23,7 +23,6 @@ app.get('/api/health', (_request, response) => {
 
 app.use('/api/feedback', feedbackRouter);
 app.use('/api/admin', adminRouter);
-
 if (hasPublicAssets) {
   app.use(express.static(publicDir));
 

@@ -1,4 +1,3 @@
-import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname, isAbsolute, join } from 'node:path';
@@ -44,13 +43,6 @@ db.exec(`
     path TEXT NOT NULL,
     referrer TEXT,
     device TEXT NOT NULL,
-    created_at TEXT NOT NULL DEFAULT (datetime('now'))
-  );
-
-  CREATE TABLE IF NOT EXISTS admin_access (
-    id INTEGER PRIMARY KEY CHECK (id = 1),
-    password_hash TEXT NOT NULL,
-    password_salt TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
@@ -115,44 +107,6 @@ const getBuckets = <T extends CountBucket>(sql: string, rowsKey: string): T[] =>
     label: String(row[rowsKey]),
     count: Number(row.count ?? 0)
   })) as T[];
-};
-
-export const isAdminPasswordConfigured = (): boolean => {
-  const row = db.prepare('SELECT 1 AS configured FROM admin_access WHERE id = 1').get() as
-    | { configured: number }
-    | undefined;
-  return row?.configured === 1;
-};
-
-const hashAdminPassword = (password: string, salt: Buffer): Buffer =>
-  scryptSync(password, salt, 64);
-
-export const createAdminPassword = (password: string): boolean => {
-  const salt = randomBytes(16);
-  const passwordHash = hashAdminPassword(password, salt);
-  const result = db
-    .prepare(
-      `INSERT OR IGNORE INTO admin_access (id, password_hash, password_salt)
-       VALUES (1, ?, ?)`
-    )
-    .run(passwordHash.toString('hex'), salt.toString('hex'));
-
-  return result.changes === 1;
-};
-
-export const verifyAdminPassword = (password: string): boolean => {
-  const row = db
-    .prepare('SELECT password_hash, password_salt FROM admin_access WHERE id = 1')
-    .get() as { password_hash: string; password_salt: string } | undefined;
-
-  if (!row) {
-    return false;
-  }
-
-  const expectedHash = Buffer.from(row.password_hash, 'hex');
-  const actualHash = hashAdminPassword(password, Buffer.from(row.password_salt, 'hex'));
-
-  return expectedHash.length === actualHash.length && timingSafeEqual(expectedHash, actualHash);
 };
 
 export const listFeedback = (

@@ -506,25 +506,6 @@ small {
   background: rgba(255, 255, 255, 0.42);
 }
 
-.private-unlock-panel {
-  width: min(520px, 100%);
-  justify-self: center;
-}
-
-.private-unlock-form {
-  gap: 16px;
-}
-
-.private-unlock-form .field-block {
-  border: 0;
-  padding: 0;
-}
-
-.form-message.error {
-  background: #fff1f1;
-  color: #aa3636;
-}
-
 .private-list {
   display: grid;
   gap: 16px;

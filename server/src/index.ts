@@ -5,6 +5,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import feedbackRouter from './routes/feedback.js';
 import adminRouter from './routes/admin.js';
+import authRouter from './routes/auth.js';
 
 const app = express();
 const port = Number(process.env.PORT ?? 4000);
@@ -23,7 +24,7 @@ app.get('/api/health', (_request, response) => {
 
 app.use('/api/feedback', feedbackRouter);
 app.use('/api/admin', adminRouter);
-
+app.use('/api/auth', authRouter);
 if (hasPublicAssets) {
   app.use(express.static(publicDir));
 

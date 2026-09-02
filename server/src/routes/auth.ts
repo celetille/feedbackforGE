@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { accountExists, createAccount, findAccount } from '../db.js';
+import { accountExists, createAccount, findAccount, getPrivateAccountUsername } from '../db.js';
 
 const router = Router();
 const usernameSchema = z
@@ -12,6 +12,17 @@ const usernameSchema = z
 
 router.get('/status', (_request, response) => {
   response.json({ hasAccount: accountExists() });
+});
+
+router.get('/current', (_request, response) => {
+  const username = getPrivateAccountUsername();
+
+  if (!username) {
+    response.status(404).json({ message: '账户尚未创建' });
+    return;
+  }
+
+  response.json({ username });
 });
 
 router.post('/register', (request, response) => {

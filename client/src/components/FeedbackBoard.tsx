@@ -32,7 +32,7 @@ export default function FeedbackBoard({
     <section className="panel board-panel" aria-labelledby="feedback-board-title">
       <div className="section-heading board-heading">
         <div>
-          <p className="eyebrow">公开看板</p>
+          <p className="eyebrow">辅导员信箱</p>
           <h2 id="feedback-board-title">大家正在关心什么</h2>
         </div>
         <span className="feedback-count">{feedback.length} 条</span>

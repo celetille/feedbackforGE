@@ -104,7 +104,7 @@ function HomePage() {
       <header className="hero">
         <div>
           <p className="eyebrow">Campus Voice</p>
-          <h1>校园意见箱与公开面板</h1>
+          <h1>辅导员信箱</h1>
         </div>
       </header>
 

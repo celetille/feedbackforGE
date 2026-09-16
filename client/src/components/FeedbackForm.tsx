@@ -67,7 +67,7 @@ export default function FeedbackForm({
         <h2 id="feedback-form-title">提交你的{isPrivate ? '私密' : '校园'}反馈</h2>
         <p>
           {isPrivate
-            ? '这条留言不会出现在公开面板上，只会让导员查看。'
+            ? '这条留言不会公开显示，只会让辅导员查看。'
             : '无需登录，不填写姓名、学号或联系方式。'}
         </p>
       </div>

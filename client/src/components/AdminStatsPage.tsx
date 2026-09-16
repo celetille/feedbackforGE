@@ -61,13 +61,13 @@ export default function AdminStatsPage({ stats, isLoading, error, onRetry }: Adm
       <header className="hero stats-hero">
         <div>
           <p className="eyebrow">访问统计后台</p>
-          <h1>校园意见箱运行概览</h1>
+          <h1>辅导员信箱运行概览</h1>
           <p className="stats-intro">
             这里展示的是匿名访问和反馈聚合数据，只统计时间、设备、路径和来源，不记录姓名、手机号或账号。
           </p>
         </div>
         <a className="home-link" href="/">
-          返回意见箱首页
+          返回辅导员信箱首页
         </a>
       </header>
 
